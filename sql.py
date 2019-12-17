@@ -23,3 +23,22 @@ class DBControl:
             return True
         except BaseException:
             return False
+    def findWord(self,k):
+        '''根据关键字查询单词列表'''
+        cur = self.conn.cursor()
+        str="select * from Word where english like '"+k+"%';"
+        cur.execute(str)
+        data = cur.fetchall()
+        self.conn.commit()
+        return data
+    def updateWord(self,data):
+        '''更新单词列表'''
+        cur = self.conn.cursor()
+        for item in data:
+            if(item[1].strip()!="" and item[2].strip()!=""):
+                sql="update Word set english =:e,chinese =:c where id=:i;"
+                cur.execute(sql,{"e":item[1],"c":item[2],"i":item[0]})
+            else:
+                sql="delete from Word where id=:i"
+                cur.execute(sql,{"i":item[0]})
+        self.conn.commit()

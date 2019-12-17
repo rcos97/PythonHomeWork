@@ -2,11 +2,11 @@
 
 import wx
 import sql
-import wx.grid
-import tt
+
+import tableGui
 
 app = wx.App(False)  # 每一个wxPython应用程序都是wx.App这个类的一个实例,False”，意味着不重定向标准输出和错误输出到窗口上。
-frame = wx.Frame(None, wx.ID_ANY, "大学英语词汇学习系统",size=(600,400))  # None代表没有父类,是一个顶级窗口
+frame = wx.Frame(None, wx.ID_ANY, "大学英语词汇学习系统",size=(600,500))  # None代表没有父类,是一个顶级窗口
 frame2 =wx.Frame(None,-1,"修改")
 app.SetTopWindow(frame)
 db = sql.DBControl()  # 初始化数据库
@@ -58,18 +58,11 @@ def initGui():
             chinesInput.SetValue("")
         else:
             wx.MessageBox("提交失败", "Message", wx.OK | wx.ICON_INFORMATION)
-    findWordFlag=1
+
     def findWord(e):
         '''查询单词'''
         content = findEInput.GetValue()
-        print(content)
-        sonGui()
-        if(findWordFlag==1):
-            frame2.Show(True)
-            findWordFlag = 0
-        else:
-            frame2.Show(False)
-            findWordFlag = 1
+        sonGui(content)
     #gui界面
     panel = wx.Panel(frame, -1)  # panel是窗口的容器，通常其大小与Frame一样，在其上放置各种控件
     # 左半边
@@ -150,9 +143,14 @@ def initGui():
     panel.SetSizer(mainBox)
 
 # 修改单词的子界面
-def sonGui():
+def sonGui(content):
     panel = wx.Panel(frame2, -1)
-    obj = tt.GridFrame(None)
+    obj = tableGui.GridFrame(panel,content)
+    subButton=wx.Button(panel, -1, label="确定")
+    subBox = wx.BoxSizer(wx.VERTICAL)
+    subBox.Add(obj,0,wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL, border=20)
+    subBox.Add(subButton,0,wx.BOTTOM | wx.ALIGN_CENTER_HORIZONTAL, border=20)
+    panel.SetSizer(subBox)
 initGui()
 frame.Show(True)  # 展示窗口
 app.MainLoop()  # 监听事件
