@@ -32,7 +32,7 @@ def initGui():
         id = cb.GetLabel()[3::]
         if (cb.GetValue() == True):
             review.append(id)
-        else:
+        elif id in review:
             review.remove(id)
 
     def show(e):
@@ -45,7 +45,12 @@ def initGui():
             return
 
     def update(e):  # 上传信息
-        pass
+        r=[x[0] for x in wordList]
+        for y in review :
+            r.remove(int(y))
+        print(r)
+        db.updateReview(r)
+        wx.MessageBox("提交成功", "Message", wx.OK | wx.ICON_INFORMATION)
 
     def addWord(e):
         '''提交新单词'''

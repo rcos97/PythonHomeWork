@@ -1,5 +1,5 @@
 import sqlite3
-import time
+from datetime import datetime
 #数据库操作
 
 class DBControl:
@@ -8,16 +8,25 @@ class DBControl:
         self.conn = sqlite3.connect('test.db')
     def reviewWord(self):
         '''搜索需要复习的单词,返回一个列表，列表中有信息的元组'''
+        # 寻找需要复习的的单词 1、2、4、7、15天后复习
         cur = self.conn.cursor()
         cur.execute("select * from Word")
         data = cur.fetchall()
+        datas=[]
+        nowTime = datetime.now()
+        for x in data:
+            addTime=datetime.strptime(str(x[4]),"%Y-%m-%d %H:%M:%S.%f")
+            reviewTime=(nowTime-addTime).days
+            if(reviewTime==0 or reviewTime==1 or reviewTime==2 or reviewTime==4 or reviewTime==7 or reviewTime==15):
+                datas.append(x)
         self.conn.commit()#提交事务
-        return data
+        return datas
     def addWord(self,e,c):
         '''增加单词'''
         try:
             cur = self.conn.cursor()
-            t=time.time()
+            a=datetime.now()
+            t=a
             cur.execute("insert into Word(english,chinese,time) values(:e,:c,:t)",{"e":e,"c":c,"t":str(t)})
             self.conn.commit()
             return True
@@ -42,3 +51,12 @@ class DBControl:
                 sql="delete from Word where id=:i"
                 cur.execute(sql,{"i":item[0]})
         self.conn.commit()
+    def updateReview(self,reviewId):
+        '''更新复习单词'''
+        now =str(datetime.now())
+        cur=self.conn.cursor()
+        sql = "update Word set time = :t where id=:id"
+        for x in reviewId:
+            cur.execute(sql,{"t":now,"id":int(x)})
+        self.conn.commit()
+
