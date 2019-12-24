@@ -26,21 +26,19 @@ frame.SetMenuBar(menuBar)  # 框架设置菜单栏
 # 初始主界面
 def initGui():
     # 事件
-    def onChecked(e):
+    def onChecked(e,m):
         '''将review 存放了已经复习完的单词的id'''
         cb = e.GetEventObject()
-        id = cb.GetLabel()[3::]
         if (cb.GetValue() == True):
-            review.append(id)
+            review.append(str(m))
         elif id in review:
-            review.remove(id)
+            review.remove(str(m))
 
-    def show(e):
+    def show(e,m):
         '''点击显示中文'''
         try:
             cb = e.GetEventObject()
-            id = cb.GetLabel()[4::]
-            cb.SetLabel(wordList[int(id)][2])
+            cb.SetLabel(wordList[int(m)][2])
         except BaseException:
             return
 
@@ -86,14 +84,17 @@ def initGui():
         a = wx.StaticText(panel, -1, label=word[1])
         a.SetFont(font2)
         listGrid.Add(a, 2, wx.LEFT | wx.ALIGN_CENTER, 20)  # 不能直接填写字符串，应该wx的对象
-        b = wx.StaticText(panel, -1, label="点击显示" + str(j))
-        j = j + 1
+
+        b = wx.StaticText(panel, -1, label="点击显示")
         b.SetFont(font2)
-        b.Bind(wx.EVT_LEFT_DOWN, show)
+        b.Bind(wx.EVT_LEFT_DOWN, lambda evt, mark=j: show(evt,mark) )
+        j = j + 1
+        # b.Bind(wx.EVT_LEFT_DOWN, show)
         listGrid.Add(b, 2, wx.LEFT | wx.ALIGN_CENTER, 20)
-        c = wx.CheckBox(panel, -1, label="记住了" + str(word[0]))
+        c = wx.CheckBox(panel, -1, label="记住了")
         listGrid.Add(c, 1, wx.LEFT | wx.ALIGN_CENTER, 20)
-        c.Bind(wx.EVT_CHECKBOX, onChecked)
+        c.Bind(wx.EVT_CHECKBOX, lambda evt, mark=word[0]: onChecked(evt, mark))
+        # c.Bind(wx.EVT_CHECKBOX, onChecked)
     okButton = wx.Button(panel, -1, label="确定")
     okButton.Bind(wx.EVT_BUTTON, update)
     leftBox.Add(listGrid, 0, wx.ALIGN_CENTER, 20)
